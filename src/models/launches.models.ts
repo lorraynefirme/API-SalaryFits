@@ -63,13 +63,13 @@ export const launchesAxios = async (url: string): (Promise<ILaunche[] | null>) =
 }
 
 export const writingLaunches = async (): Promise<void> => {
-    console.log('Consultado os dados da API SpaceX')
+    console.log('-- Consultado os dados da API SpaceX')
 
     const launchesPastResponse = await launchesAxios('https://api.spacexdata.com/v4/launches/past')
     const launchesUpcomingResponse = await launchesAxios('https://api.spacexdata.com/v4/launches/upcoming')
     let launchesResponse: ILaunche[] = []
 
-    console.log('Salvando os dados no banco de dados')
+    console.log('-- Salvando os dados no banco de dados')
     if(launchesPastResponse && launchesUpcomingResponse)
        launchesResponse = [...launchesPastResponse, ...launchesUpcomingResponse]
   
