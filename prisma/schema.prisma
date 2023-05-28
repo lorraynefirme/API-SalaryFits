@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model LaunchesTable {   
+  id                    String  @id @unique
+  static_fire_date_utc  String?
+  static_fire_date_unix Int?
+  net                   Boolean?
+  window                Int?
+  rocket                String?
+  success               Boolean?
+  details               String?
+  launchpad             String?
+  flight_number         Int?
+  name                  String?
+  date_utc              String?
+  date_unix             Int?
+  date_local            String?
+  date_precision        String?
+  upcoming              Boolean
+}
