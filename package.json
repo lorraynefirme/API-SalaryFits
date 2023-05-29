@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "start:dev": "nodemon",
+    "createdb": "npx prisma migrate dev",
     "build": "npx tsc"
   },
   "keywords": [],

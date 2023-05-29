@@ -63,7 +63,10 @@ $ npm install
 
 # Preencha as variáveis de ambiente
 
+# Execute para criar as tabelas no banco de dados
+$ npm run createdb
+
 # Execute a aplicação em modo de desenvolvimento
-$ npm start:dev
+$ npm run start:dev
 ```
 
