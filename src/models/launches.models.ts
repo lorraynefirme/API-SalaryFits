@@ -1,63 +1,19 @@
-import { PrismaClient, LaunchesTable } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import axios from 'axios'
+import ILaunch from '../types/ILaunch';
+import ILaunchUpdate from '../types/ILaunchUpdate';
+import IResult from '../types/IResult';
 
 const prisma = new PrismaClient()
 
-interface ILaunche {
-    id: string;
-    static_fire_date_utc?: string;
-    static_fire_date_unix?: number;
-    net?: boolean;
-    window?: number;
-    rocket?: string;
-    success?: boolean;
-    details?: string;
-    launchpad?: string;
-    flight_number?: number;
-    name?: string;
-    date_utc?: string;
-    date_unix?: number;
-    date_local?: string;
-    date_precision?: string;
-    upcoming: boolean;
-}[]
-
-interface ILauncheUpdate {
-  static_fire_date_utc?: string;
-  static_fire_date_unix?: number;
-  net?: boolean;
-  window?: number;
-  rocket?: string;
-  success?: boolean;
-  details?: string;
-  launchpad?: string;
-  flight_number?: number;
-  name?: string;
-  date_utc?: string;
-  date_unix?: number;
-  date_local?: string;
-  date_precision?: string;
-  upcoming?: boolean;
-}[]
-
-interface IResult {
-    success: boolean;
-    data?: LaunchesTable |LaunchesTable[] | null;
-    error?: string;
-}
-  
-export const launchesAxios = async (url: string): (Promise<ILaunche[] | null>) => {
+export const launchesAxios = async (url: string): (Promise<ILaunch[] | null>) => {
     try {
-      const response = await axios.get<ILaunche[]>(url)      
-
-      if (response.status !== 200) {
-        throw new Error('Ocorreu um erro')
-      }
-      
+      const response = await axios.get<ILaunch[]>(url)         
       const launches = response.data.map(( {static_fire_date_utc, static_fire_date_unix, net, window, rocket, success, details, launchpad, flight_number, name, date_utc, date_unix, date_local, date_precision, upcoming, id} ) => ( { static_fire_date_utc, static_fire_date_unix, net, window, rocket, success, details, launchpad, flight_number, name, date_utc, date_unix, date_local, date_precision, upcoming, id} ))
       
       return launches
     } catch (error) {
+      console.log('Ocorreu um erro ao buscar os dados na API SpaceX.')
       return null
     }
 }
@@ -67,7 +23,7 @@ export const writingLaunches = async (): Promise<void> => {
 
     const launchesPastResponse = await launchesAxios('https://api.spacexdata.com/v4/launches/past')
     const launchesUpcomingResponse = await launchesAxios('https://api.spacexdata.com/v4/launches/upcoming')
-    let launchesResponse: ILaunche[] = []
+    let launchesResponse: ILaunch[] = []
 
     console.log('-- Salvando os dados no banco de dados')
     if(launchesPastResponse && launchesUpcomingResponse)
@@ -84,7 +40,7 @@ export const writingLaunches = async (): Promise<void> => {
       console.log("--", count, "Registros escritos no banco")  
       return
     } catch (error) {
-      throw error
+      console.log("Erro ao salvar registros no banco.", error)
     }   
 }
   
@@ -97,7 +53,7 @@ export const readingLaunchesPast = async(): Promise<IResult> => {
       })
       return { success: true, data: dbresp }
     } catch (error) {
-      return { success: false, error: 'Erro ao buscar os lançamentos passado.' }
+      return { success: false, error: 'Erro ao buscar os lançamentos passados.' }
     }
 }
   
@@ -140,7 +96,7 @@ export const deletingLaunchById = async(id : string): Promise<IResult> => {
   }
 }
 
-export const updatingLaunchById = async(id : string, data: ILauncheUpdate): Promise<IResult> => {
+export const updatingLaunchById = async(id : string, data: ILaunchUpdate): Promise<IResult> => {
   try {
     const dbresp = await prisma.launchesTable.update({
       where: {

@@ -1,25 +1,7 @@
 import type { Request, Response } from 'express'
 import { readingLaunchesPast, readingLaunchesUpcoming, findingLaunchById, deletingLaunchById, updatingLaunchById } from '../models/launches.models'
-import { z } from "zod";
-import { fromZodError } from 'zod-validation-error';
-
-const launchUpdateSchema = z.object({
-    static_fire_date_utc: z.string().optional(),
-    static_fire_date_unix: z.number().optional(),
-    net: z.boolean().optional(),
-    window: z.number().optional(),
-    rocket: z.string().optional(),
-    success: z.boolean().optional(),
-    details: z.string().optional(),
-    launchpad: z.string().optional(),
-    flight_number: z.number().optional(),
-    name: z.string().optional(),
-    date_utc: z.string().optional(),
-    date_unix: z.number().optional(),
-    date_local: z.string().optional(),
-    date_precision: z.string().optional(),
-    upcoming: z.boolean().optional(),
-});
+import { fromZodError } from 'zod-validation-error'
+import launchUpdateSchema from '../types/launchUpdateSchema';
 
 export const readLaunchesPastController = async (req: Request, res: Response): Promise<void> => {
     const resp = await readingLaunchesPast()
@@ -62,8 +44,8 @@ export const updateLaunchController = async (req: Request, res: Response): Promi
         const validateBody = launchUpdateSchema.parse(req.body);
 
         if(!Object.keys(validateBody).length && Object.keys(req.body).length)
-            res.send({ error: "Dados inválido." })
-        else if(!Object.keys(validateBody).length)
+            res.send({ error: "Dados inválidos." })
+        else if(!Object.keys(req.body).length)
             res.send({ message: "Nenhum dado enviado para atualização." })
         else{
             const resp = await updatingLaunchById(req.params.id, validateBody)
@@ -72,8 +54,8 @@ export const updateLaunchController = async (req: Request, res: Response): Promi
             else
                 res.send(resp.data) 
         }   
-    } catch (err : any) {
-        const validationError = fromZodError(err); 
+    } catch (error : any) {
+        const validationError = fromZodError(error); 
         const message = validationError.details[0].message;
         const variable = validationError.details[0].path;
         res.status(400).send({error: ` ${ variable } : ${ message }`})  
